@@ -1,11 +1,16 @@
-# Reinforcement Learning with DDPG
+# Deep RL for mobile robot navigation [ROS - Gazebo]
 
-For this project my goal is to create a Deep reinforcement learning Code that can avoid obstacles while trying to get to a target
+This is the code accompanyting the paper...
 
-## Base Idea
+## Prerequisite packages
 
-I saw a code of a DQN agent in the repository of ROBOTIS. But to create a better agent to control Robots I didn't see DQN with too much help in project because it only permits discrete actions. So my idea were to create a DDPG algorithm's agent based. A DDPG agent permits continous control for a robot. In my case I have as outputs: linear velocity (0 ~ 0.22m/s) and angular velocity (-1 ~ 1rad/s).
+Openai gym environmentss
 
+```
+cd ~/catkin_ws/src/
+git clone {link_git}
+cd ~/catkin_ws && catkin_make
+```
 - https://github.com/ROBOTIS-GIT/turtlebot3_machine_learning
 
 ## Libraries

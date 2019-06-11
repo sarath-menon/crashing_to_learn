@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 import torch
 import gym
@@ -38,7 +39,8 @@ def evaluate_policy(policy, eval_episodes=10):
 
 
 if __name__ == "__main__":
-	rospy.init_node('ddpg_stage_1')
+	rospy.init_node('ddpg_stage_1',argv=sys.argv, anonymous=False, disable_signals=True, log_level=rospy.INFO)
+	sys.argv = rospy.myargv(argv=sys.argv)
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--policy_name", default="TD3")					# Policy name
@@ -93,11 +95,11 @@ if __name__ == "__main__":
 	done = True
 
 	while True:
-		
+
 		while episode_timesteps < args.max_timesteps:
 			if done:
 
-				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/gym_mobilerobot_models/')
+				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 
 				if total_timesteps != 0:
 					print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timesteps, episode_reward)

@@ -43,7 +43,7 @@ if __name__ == "__main__":
 	sys.argv = rospy.myargv(argv=sys.argv)
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--policy_name", default="TD3")					# Policy name
+	parser.add_argument("--policy_name", default="DDPG")					# Policy name
 	parser.add_argument("--env_name", default="Mobilerobot-v0")			# OpenAI gym environment name
 	parser.add_argument("--seed", default=0, type=int)					# Sets Gym, PyTorch and Numpy seeds
 	parser.add_argument("--start_timesteps", default=1e4, type=int)		# How many time steps purely random policy is run for
@@ -59,7 +59,9 @@ if __name__ == "__main__":
 	parser.add_argument("--policy_freq", default=2, type=int)			# Frequency of delayed policy updates
 	args = parser.parse_args()
 
+
 	file_name = "%s_%s_%s" % (args.policy_name, args.env_name, str(args.seed))
+	print "123"
 	print "---------------------------------------"
 	print "Settings: %s" % (file_name)
 	print "---------------------------------------"
@@ -98,6 +100,7 @@ if __name__ == "__main__":
 
 		while episode_timesteps < args.max_timesteps:
 			if done:
+				episode_timesteps = 0
 
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 
@@ -123,7 +126,7 @@ if __name__ == "__main__":
 				obs = env.reset()
 				done = False
 				episode_reward = 0
-				episode_timesteps = 0
+
 				episode_num += 1
 
 			# Select action randomly or according to policy
@@ -136,7 +139,7 @@ if __name__ == "__main__":
 
 			# Perform action
 			new_obs, reward, done, _ = env.step(action)
-			done_bool = 0 if episode_timesteps + 1 == 500 else float(done)
+			done_bool = 0 if episode_timesteps + 1 == args.max_timesteps else float(done)
 			episode_reward += reward
 
 			# Store data in replay buffer

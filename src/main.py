@@ -122,8 +122,8 @@ if __name__ == "__main__":
 			else:
 				action = policy.select_action(np.array(obs))
 				if args.expl_noise != 0:
-					action[0] = (action[0] + np.random.normal(0, args.expl_noise).clip(0., max_action[0])
-					action[1] = (action[1] + np.random.normal(0, args.expl_noise).clip(-2., max_action[1])
+					action[0] = action[0] + np.random.normal(0, args.expl_noise).clip(0., max_action[0])
+					action[1] = action[1] + np.random.normal(0, args.expl_noise).clip(-2., max_action[1])
 
 			# Perform action
 			print('Episode timesteps:',episode_timesteps)

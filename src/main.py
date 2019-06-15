@@ -89,20 +89,17 @@ if __name__ == "__main__":
 	total_timesteps = 0
 	timesteps_since_eval = 0
 	episode_num = 0
-	episode_timesteps = 0
 	done = True
 
 	while True:
 
-		while episode_timesteps < args.max_timesteps:
+		for  episode_timesteps in range(args.max_timesteps):
 			if done:
-
 
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 
 				if total_timesteps != 0:
 					print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timesteps, episode_reward)
-					episode_timesteps = 0
 					if args.policy_name == "TD3":
 						policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau, args.policy_noise, args.noise_clip, args.policy_freq)
 					else:
@@ -136,7 +133,6 @@ if __name__ == "__main__":
 
 			obs = new_obs
 
-			episode_timesteps += 1
 			total_timesteps += 1
 			timesteps_since_eval += 1
 

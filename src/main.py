@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	while True:
 
 		for  episode_timesteps in range(args.max_timesteps):
-			if done:
+			if done or episode_timesteps == (args.max_timesteps-1):
 
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 
@@ -104,6 +104,8 @@ if __name__ == "__main__":
 						policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau, args.policy_noise, args.noise_clip, args.policy_freq)
 					else:
 						policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau)
+
+				break
 
 				# Reset environment
 

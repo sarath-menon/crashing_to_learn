@@ -46,7 +46,7 @@ if __name__ == "__main__":
 	parser.add_argument("--policy_name", default="DDPG")					# Policy name
 	parser.add_argument("--env_name", default="Mobilerobot-v0")			# OpenAI gym environment name
 	parser.add_argument("--seed", default=0, type=int)					# Sets Gym, PyTorch and Numpy seeds
-	parser.add_argument("--start_timesteps", default=1e4, type=int)		# How many time steps purely random policy is run for
+	parser.add_argument("--start_timesteps", default=1e2, type=int)		# How many time steps purely random policy is run for
 	parser.add_argument("--eval_freq", default=5e3, type=float)			# How often (time steps) we evaluate
 	parser.add_argument("--max_timesteps", default=500, type=float)		# max no of timesteps for each environment
 	parser.add_argument("--save_models", action="store_true")			# Whether or not models are saved

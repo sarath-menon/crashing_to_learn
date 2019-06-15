@@ -8,7 +8,7 @@ import os
 
 import utils
 import TD3
-import OurDDPG
+import OurDDPG_test
 import DDPG
 
 import rospy
@@ -20,22 +20,22 @@ dirPath = os.path.dirname(os.path.realpath(__file__))
 #---Functions to make network updates---#
 
 # Runs policy for X episodes and returns average reward
-def evaluate_policy(policy, eval_episodes=10):
-	avg_reward = 0.
-	for _ in xrange(eval_episodes):
-		obs = env.reset()
-		done = False
-		while not done:
-			action = policy.select_action(np.array(obs))
-			obs, reward, done, _ = env.step(action)
-			avg_reward += reward
-
-	avg_reward /= eval_episodes
-
-	print "---------------------------------------"
-	print "Evaluation over %d episodes: %f" % (eval_episodes, avg_reward)
-	print "---------------------------------------"
-	return avg_reward
+# def evaluate_policy(policy, eval_episodes=10):
+# 	avg_reward = 0.
+# 	for _ in xrange(eval_episodes):
+# 		obs = env.reset()
+# 		done = False
+# 		while not done:
+# 			action = policy.select_action(np.array(obs))
+# 			obs, reward, done, _ = env.step(action)
+# 			avg_reward += reward
+#
+# 	avg_reward /= eval_episodes
+#
+# 	print "---------------------------------------"
+# 	print "Evaluation over %d episodes: %f" % (eval_episodes, avg_reward)
+# 	print "---------------------------------------"
+# 	return avg_reward
 
 
 if __name__ == "__main__":
@@ -81,9 +81,9 @@ if __name__ == "__main__":
 	max_action = float(env.action_space.high[0])
 
 	# Initialize policy
-	if args.policy_name == "TD3":policy = TD3.TD3(state_dim, action_dim, max_action)
-	elif args.policy_name == "OurDDPG": policy = OurDDPG.DDPG(state_dim, action_dim, max_action)
-	elif args.policy_name == "DDPG": policy = DDPG.DDPG(state_dim, action_dim, max_action)
+	if args.policy_name == "TD3":policy = TD3_test.TD3(state_dim, action_dim, max_action)
+	elif args.policy_name == "OurDDPG": policy = OurDDPG_test.DDPG(state_dim, action_dim, max_action)
+	elif args.policy_name == "DDPG": policy = DDPG_test.DDPG(state_dim, action_dim, max_action)
 
 	replay_buffer = utils.ReplayBuffer()
 

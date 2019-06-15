@@ -46,7 +46,7 @@ if __name__ == "__main__":
 	parser.add_argument("--policy_name", default="DDPG")					# Policy name
 	parser.add_argument("--env_name", default="Mobilerobot-v0")			# OpenAI gym environment name
 	parser.add_argument("--seed", default=0, type=int)					# Sets Gym, PyTorch and Numpy seeds
-	parser.add_argument("--start_timesteps", default=2e2, type=int)		# How many time steps purely random policy is run for
+	parser.add_argument("--start_timesteps", default=2e4, type=int)		# How many time steps purely random policy is run for
 	parser.add_argument("--eval_freq", default=5e3, type=float)			# How often (time steps) we evaluate
 	parser.add_argument("--max_timesteps", default=500, type=float)		# max no of timesteps for each environment
 	parser.add_argument("--save_models", action="store_true")			# Whether or not models are saved
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 					action[1] = (action[1] + np.random.normal(0, args.expl_noise, size=1)).clip(-2., max_action[1])
 
 			# Perform action
-			print('Episode timesteps:',episode_timesteps)
+			# print('Episode timesteps:',episode_timesteps)
 			new_obs, reward, done, _ = env.step(action)
 			done_bool = 0 if episode_timesteps + 1 == args.max_timesteps else float(done)
 			episode_reward += reward

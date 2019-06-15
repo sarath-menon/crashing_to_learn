@@ -28,7 +28,7 @@ class Actor(nn.Module):
 		x = self.l3(x)
 		# if x.shape == torch.Size([14]):
 		x[0,0] = torch.sigmoid(x[0,0])*  self.max_action[0]
-		x[0,1] = torch.tanh(x[1,0])*  self.max_action[1]
+		x[0,1] = torch.tanh(x[0,1])*  self.max_action[1]
 		# else:
 		# 	x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
 		# 	x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]

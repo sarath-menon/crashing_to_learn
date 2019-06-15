@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	while True:
 
 		for  episode_timesteps in range(args.max_timesteps):
-			if done or episode_timesteps == (args.max_timesteps-1):
+			if done:
 
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 

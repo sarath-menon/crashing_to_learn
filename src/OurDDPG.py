@@ -12,12 +12,17 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Actor(nn.Module):
-	def __init__(self, state_dim, action_dim, max_action):
+	def __init__(self, state_dim, action_dim, max_action,eps=0.003):
 		super(Actor, self).__init__()
 
 		self.l1 = nn.Linear(state_dim, 512)
+		torch.nn.init.xavier_uniform(self.l1.weight)
+
 		self.l2 = nn.Linear(512, 512)
+		torch.nn.init.xavier_uniform(self.l2.weight)
+
 		self.l3 = nn.Linear(512, action_dim)
+		self.l3.weight.data.uniform_(-eps, eps)
 
 		self.max_action = max_action
 
@@ -40,8 +45,11 @@ class Critic(nn.Module):
 		super(Critic, self).__init__()
 
 		self.l1 = nn.Linear(state_dim + action_dim, 512)
+		torch.nn.init.xavier_uniform(self.l1.weight)
 		self.l2 = nn.Linear(512, 512)
+		torch.nn.init.xavier_uniform(self.l2.weight) 
 		self.l3 = nn.Linear(512, 1)
+		self.l3.weight.data.uniform_(-eps, eps)
 
 
 	def forward(self, x, u):

@@ -94,9 +94,10 @@ if __name__ == "__main__":
 	while True:
 
 		for  episode_timesteps in range(args.max_timesteps):
-			if done:
-
+			print('for loop ok')
+			if done or episode_timesteps == args.max_timesteps-1:
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
+
 
 				if total_timesteps != 0:
 					print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timesteps, episode_reward)
@@ -118,6 +119,7 @@ if __name__ == "__main__":
 			# Select action randomly or according to policy
 			if total_timesteps < args.start_timesteps:
 				action = env.action_space.sample()
+				print('random action')
 			else:
 				action = policy.select_action(np.array(obs))
 				if args.expl_noise != 0:

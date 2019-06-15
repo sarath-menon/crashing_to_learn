@@ -26,12 +26,12 @@ class Actor(nn.Module):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
 		x = self.l3(x)
-		if x.shape == torch.Size([14]):
-			x[0] = torch.sigmoid(x[0])*  self.max_action[0]
-			x[1] = torch.tanh(x[1])*  self.max_action[1]
-		else:
-			x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
-			x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
+		# if x.shape == torch.Size([14]):
+		x[0] = torch.sigmoid(x[0])*  self.max_action[0]
+		x[1] = torch.tanh(x[1])*  self.max_action[1]
+		# else:
+		# 	x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
+		# 	x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
 		return x
 
 

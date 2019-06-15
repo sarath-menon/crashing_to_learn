@@ -86,9 +86,6 @@ if __name__ == "__main__":
 
 	replay_buffer = utils.ReplayBuffer()
 
-	# Evaluate untrained policy
-	# evaluations = [evaluate_policy(policy)]
-
 	total_timesteps = 0
 	timesteps_since_eval = 0
 	episode_num = 0
@@ -99,26 +96,17 @@ if __name__ == "__main__":
 
 		while episode_timesteps < args.max_timesteps:
 			if done:
-				episode_timesteps = 0
+
 
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 
 				if total_timesteps != 0:
 					print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timesteps, episode_reward)
+					episode_timesteps = 0
 					if args.policy_name == "TD3":
 						policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau, args.policy_noise, args.noise_clip, args.policy_freq)
 					else:
 						policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau)
-
-
-
-				# Evaluate episode
-				# if timesteps_since_eval >= args.eval_freq:
-				# 	timesteps_since_eval %= args.eval_freq
-				# 	evaluations.append(evaluate_policy(policy))
-				#
-				# 	if args.save_models: policy.save(file_name, directory="./pytorch_models")
-				# 	np.save("./results/%s" % (file_name), evaluations)
 
 				# Reset environment
 
@@ -137,8 +125,8 @@ if __name__ == "__main__":
 					action[0] = (action[0] + np.random.normal(0, args.expl_noise, size=env.action_space.shape[0])).clip(env.action_space.low[0], env.action_space.high[0])
 					action[1] = (action[1] + np.random.normal(0, args.expl_noise, size=env.action_space.shape[0])).clip(env.action_space.low[1], env.action_space.high[1])
 
-
 			# Perform action
+            print('Episode timesteps:',episode_timesteps)
 			new_obs, reward, done, _ = env.step(action)
 			done_bool = 0 if episode_timesteps + 1 == args.max_timesteps else float(done)
 			episode_reward += reward

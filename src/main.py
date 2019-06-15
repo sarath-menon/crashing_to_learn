@@ -93,9 +93,8 @@ if __name__ == "__main__":
 
 	while True:
 
-		for  episode_timesteps in range(args.max_timesteps):
-			print('for loop ok')
-			if done or episode_timesteps == args.max_timesteps-1:
+		for episode_timesteps in range(args.max_timesteps):
+			if done or (episode_timesteps==args.max_timesteps-1):
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
 
 
@@ -106,8 +105,6 @@ if __name__ == "__main__":
 					else:
 						policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau)
 
-				break
-
 				# Reset environment
 
 				obs = env.reset()
@@ -115,6 +112,7 @@ if __name__ == "__main__":
 				episode_reward = 0
 
 				episode_num += 1
+				break
 
 			# Select action randomly or according to policy
 			if total_timesteps < args.start_timesteps:

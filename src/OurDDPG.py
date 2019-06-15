@@ -16,10 +16,10 @@ class Actor(nn.Module):
 		super(Actor, self).__init__()
 
 		self.l1 = nn.Linear(state_dim, 512)
-		torch.nn.init.xavier_uniform_.(self.l1.weight)
+		torch.nn.init.xavier_uniform_(self.l1.weight)
 
 		self.l2 = nn.Linear(512, 512)
-		torch.nn.init.xavier_uniform_.(self.l2.weight)
+		torch.nn.init.xavier_uniform_(self.l2.weight)
 
 		self.l3 = nn.Linear(512, action_dim)
 		self.l3.weight.data.uniform_(-eps, eps)
@@ -45,11 +45,11 @@ class Critic(nn.Module):
 		super(Critic, self).__init__()
 
 		self.l1 = nn.Linear(state_dim + action_dim, 512)
-		torch.nn.init.xavier_uniform_.(self.l1.weight)
+		torch.nn.init.xavier_uniform_(self.l1.weight)
 		self.l2 = nn.Linear(512, 512)
-		torch.nn.init.xavier_uniform_.(self.l2.weight)
+		torch.nn.init.xavier_uniform_(self.l2.weight)
 		self.l3 = nn.Linear(512, 1)
-		self.l3.weight.data.uniform_.(-eps, eps)
+		self.l3.weight.data.uniform_(-eps, eps)
 
 
 	def forward(self, x, u):

@@ -50,7 +50,7 @@ if __name__ == "__main__":
 	parser.add_argument("--eval_freq", default=5e3, type=float)			# How often (time steps) we evaluate
 	parser.add_argument("--max_timesteps", default=500, type=float)		# max no of timesteps for each environment
 	parser.add_argument("--save_models", action="store_true")			# Whether or not models are saved
-	parser.add_argument("--expl_noise", default=0.1, type=float)		# Std of Gaussian exploration noise
+	parser.add_argument("--expl_noise", default=0.2, type=float)		# Std of Gaussian exploration noise
 	parser.add_argument("--batch_size", default=100, type=int)			# Batch size for both actor and critic
 	parser.add_argument("--discount", default=0.99, type=float)			# Discount factor
 	parser.add_argument("--tau", default=0.005, type=float)				# Target network update rate
@@ -135,7 +135,9 @@ if __name__ == "__main__":
 			else:
 				action = policy.select_action(np.array(obs))
 				if args.expl_noise != 0:
-					action = (action + np.random.normal(0, args.expl_noise, size=env.action_space.shape[0])).clip(env.action_space.low, env.action_space.high)
+					action[0] = (action[0] + np.random.normal(0, args.expl_noise, size=env.action_space.shape[0])).clip(env.action_space.low[0], env.action_space.high[0])
+					action[1] = (action[1] + np.random.normal(0, args.expl_noise, size=env.action_space.shape[0])).clip(env.action_space.low[1], env.action_space.high[1])
+
 
 			# Perform action
 			new_obs, reward, done, _ = env.step(action)

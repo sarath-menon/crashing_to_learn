@@ -41,7 +41,7 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-	def __init__(self, state_dim, action_dim):
+	def __init__(self, state_dim, action_dim,eps=0.003):
 		super(Critic, self).__init__()
 
 		self.l1 = nn.Linear(state_dim + action_dim, 512)

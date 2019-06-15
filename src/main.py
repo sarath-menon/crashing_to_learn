@@ -8,7 +8,7 @@ import os
 
 import utils
 import TD3
-import OurDDPG_test
+import OurDDPG
 import DDPG
 
 import rospy
@@ -61,7 +61,6 @@ if __name__ == "__main__":
 
 
 	file_name = "%s_%s_%s" % (args.policy_name, args.env_name, str(args.seed))
-	print "123"
 	print "---------------------------------------"
 	print "Settings: %s" % (file_name)
 	print "---------------------------------------"
@@ -81,9 +80,9 @@ if __name__ == "__main__":
 	max_action = float(env.action_space.high[0])
 
 	# Initialize policy
-	if args.policy_name == "TD3":policy = TD3_test.TD3(state_dim, action_dim, max_action)
-	elif args.policy_name == "OurDDPG": policy = OurDDPG_test.DDPG(state_dim, action_dim, max_action)
-	elif args.policy_name == "DDPG": policy = DDPG_test.DDPG(state_dim, action_dim, max_action)
+	if args.policy_name == "TD3":policy = TD3.TD3(state_dim, action_dim, max_action)
+	elif args.policy_name == "OurDDPG": policy = OurDDPG.DDPG(state_dim, action_dim, max_action)
+	elif args.policy_name == "DDPG": policy = DDPG.DDPG(state_dim, action_dim, max_action)
 
 	replay_buffer = utils.ReplayBuffer()
 

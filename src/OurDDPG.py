@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Actor(nn.Module):
-	def __init__(self, state_dim, action_dim, max_linear=0.22, max_angular=2.):
+	def __init__(self, state_dim, action_dim, max_action):
 		super(Actor, self).__init__()
 
 		self.l1 = nn.Linear(state_dim, 512)
@@ -27,11 +27,11 @@ class Actor(nn.Module):
 		x = F.relu(self.l2(x))
 		x = self.l3(x)
 		if state.shape == torch.Size([14]):
-			x[0] = torch.sigmoid(action[0])* max_linear
-			x[1] = torch.tanh(action[1])* max_angular
+			x[0] = torch.sigmoid(action[0])*  max_action[0]
+			x[1] = torch.tanh(action[1])*  max_action[1]
 		else:
-			x[:,0] = torch.sigmoid(action[:,0])* max_linear
-			x[:,1] = torch.tanh(action[:,1])* max_angular
+			x[:,0] = torch.sigmoid(action[:,0])* max_action[0]
+			x[:,1] = torch.tanh(action[:,1])*  max_action[1]
 		return x
 
 

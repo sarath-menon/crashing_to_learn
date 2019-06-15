@@ -126,7 +126,7 @@ if __name__ == "__main__":
 					action[1] = (action[1] + np.random.normal(0, args.expl_noise, size=env.action_space.shape[0])).clip(env.action_space.low[1], env.action_space.high[1])
 
 			# Perform action
-            print('Episode timesteps:',episode_timesteps)
+			print('Episode timesteps:',episode_timesteps)
 			new_obs, reward, done, _ = env.step(action)
 			done_bool = 0 if episode_timesteps + 1 == args.max_timesteps else float(done)
 			episode_reward += reward

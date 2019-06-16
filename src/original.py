@@ -306,7 +306,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
     past_action = np.array([0.,0.])
-    overtime_n+=1
+    overtime_n=0
     timestep= 0
 
     for ep in range(MAX_EPISODES):
@@ -344,7 +344,7 @@ if __name__ == '__main__':
             if done or step == MAX_STEPS-1:
                 print('reward per ep: ' + str(rewards_current_episode))
                 print('explore_v: ' + str(var_v) + ' and explore_w: ' + str(var_w))
-                if step == MAX_STEPS-1: count_overtime+=1
+                if step == MAX_STEPS-1: overtime_n+=1
 
                 rewards_all_episodes.append(rewards_current_episode)
                 result = rewards_current_episode

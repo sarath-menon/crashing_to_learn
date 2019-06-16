@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
 	env = gym.make(args.env_name)
 	torch.manual_seed(args.seed)
-	np.random.seed(args.seed
+	np.random.seed(args.seed)
 	#Initializing log files
 	df1 = pd.DataFrame({"collision_n":[0], "overtime_n":[0],"goal_n":[0]})
 	df2 = pd.DataFrame({"episode":[0],"timestep":[0],"linear":[0],"angular":[0],"reward":[0]})
@@ -66,7 +66,7 @@ if __name__ == "__main__":
 	replay_buffer = utils.ReplayBuffer()
 
 	total_timesteps = 0
-	overtime_n+=1=0    # no of episodes that exceed time limit
+	overtime_n=0    # no of episodes that exceed time limit
 	var_v = max_action[0]* args.expl_noise
 	var_w = max_action[1]* args.expl_noise *2
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
             # Perform action
 			new_obs, reward, done, _ = env.step(action)
-			df_temp1 = pd.DataFrame({'episode':[episode_num)], 'timestep':[episode_timestep], 'linear':[action.item(0)], 'angular':[action.item(1)], 'reward':[reward]})
+			df_temp1 = pd.DataFrame({'episode':[episode_num], 'timestep':[episode_timestep], 'linear':[action.item(0)], 'angular':[action.item(1)], 'reward':[reward]})
 			df1 = df1.append(df_temp1, ignore_index = True,sort=False)
 			done_bool = 0 if episode_timestep + 2 == args.max_timesteps else float(done)
 			episode_reward += reward

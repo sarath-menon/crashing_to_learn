@@ -306,6 +306,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
     past_action = np.array([0.,0.])
+    overtime_n+=1
     timestep= 0
 
     for ep in range(MAX_EPISODES):
@@ -343,15 +344,17 @@ if __name__ == '__main__':
             if done or step == MAX_STEPS-1:
                 print('reward per ep: ' + str(rewards_current_episode))
                 print('explore_v: ' + str(var_v) + ' and explore_w: ' + str(var_w))
+                if step == MAX_STEPS-1: count_overtime+=1
+
                 rewards_all_episodes.append(rewards_current_episode)
                 result = rewards_current_episode
                 pub_result.publish(result)
                 m, s = divmod(int(time.time() - start_time), 60)
                 h, m = divmod(m, 60)
-                collision,overtime,goal = env.stats()
+                collision_n, goal_n = env.stats()
 
-                df_temp2 = pd.DataFrame({"episode":[ep],"ep_reward":[rewards_current_episode],"collision_n":[collision],
-                                        "overtime_n":[overtime],"goal_n":[goal]})
+                df_temp2 = pd.DataFrame({"episode":[ep],"ep_reward":[rewards_current_episode],"collision_n":[collision_n],
+                                        "overtime_n":[overtime_n],"goal_n":[goal_n]})
                 df2 = df2.append(df_temp2, ignore_index = True)
 
                 break

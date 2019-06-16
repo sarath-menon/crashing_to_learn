@@ -7,17 +7,16 @@ import utils
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Implementation of Twin Delayed Deep Deterministic Policy Gradients (TD3)
-# Paper: https://arxiv.org/abs/1802.09477
-
-
 class Actor(nn.Module):
-	def __init__(self, state_dim, action_dim, max_action):
+	def __init__(self, state_dim, action_dim, max_action,eps=0.003):
 		super(Actor, self).__init__()
 
-		self.l1 = nn.Linear(state_dim, 400)
-		self.l2 = nn.Linear(400, 300)
-		self.l3 = nn.Linear(300, action_dim)
+		self.l1 = nn.Linear(state_dim, 512)
+		torch.nn.init.xavier_uniform_(self.l1.weight)
+		self.l2 = nn.Linear(512, 512)
+		torch.nn.init.xavier_uniform_(self.l2.weight)
+		self.l3 = nn.Linear(512, action_dim)
+		self.l3.weight.data.uniform_(-eps, eps)
 
 		self.max_action = max_action
 
@@ -26,17 +25,27 @@ class Actor(nn.Module):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
 		x = self.max_action * torch.tanh(self.l3(x))
+		if x.shape == torch.Size([14]):
+			x[0] = torch.sigmoid(x[0])*  self.max_action[0]
+			x[1] = torch.tanh(x[1])*  self.max_action[1]
+		else:
+			x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
+			x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
+		return x
 		return x
 
 
 class Critic(nn.Module):
-	def __init__(self, state_dim, action_dim):
+	def __init__(self, state_dim, action_dim, eps=0.003):
 		super(Critic, self).__init__()
 
 		# Q1 architecture
-		self.l1 = nn.Linear(state_dim + action_dim, 400)
-		self.l2 = nn.Linear(400, 300)
-		self.l3 = nn.Linear(300, 1)
+		self.l1 = nn.Linear(state_dim + action_dim, 512)
+		torch.nn.init.xavier_uniform_(self.l1.weight)
+		self.l2 = nn.Linear(512, 512)
+		torch.nn.init.xavier_uniform_(self.l2.weight)
+		self.l3 = nn.Linear(512, 1)
+		self.l3.weight.data.uniform_(-eps, eps)
 
 		# Q2 architecture
 		self.l4 = nn.Linear(state_dim + action_dim, 400)

@@ -7,9 +7,6 @@ import utils
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Re-tuned version of Deep Deterministic Policy Gradients (DDPG)
-# Paper: https://arxiv.org/abs/1509.02971
-
 
 class Actor(nn.Module):
 	def __init__(self, state_dim, action_dim, max_action,eps=0.003):
@@ -26,17 +23,16 @@ class Actor(nn.Module):
 
 		self.max_action = max_action
 
-
 	def forward(self, x):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
 		x = self.l3(x)
-		# if x.shape == torch.Size([14]):
-		x[0,0] = torch.sigmoid(x[0,0])*  self.max_action[0]
-		x[0,1] = torch.tanh(x[0,1])*  self.max_action[1]
-		# else:
-		# 	x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
-		# 	x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
+		if x.shape == torch.Size([14]):
+			x[0] = torch.sigmoid(x[0])*  self.max_action[0]
+			x[1] = torch.tanh(x[1])*  self.max_action[1]
+		else:
+			x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
+			x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
 		return x
 
 
@@ -71,14 +67,14 @@ class DDPG(object):
 		self.critic_target.load_state_dict(self.critic.state_dict())
 		self.critic_optimizer = torch.optim.Adam(self.critic.parameters()) # Learning rate=0.001 by default
 
-
 	def select_action(self, state):
-		state = torch.FloatTensor(state.reshape(1, -1)).to(device)
-		return self.actor(state).cpu().data.numpy().flatten()
+		# state = torch.FloatTensor(state.reshape(1, -1)).to(device)
+		# return self.actor(state).cpu().data.numpy().flatten()
+		state = torch.from_numpy(state).to(device)
+		return self.actor(state).data.detach().numpy()
 
 
 	def train(self, replay_buffer, iterations, batch_size=100, discount=0.99, tau=0.005):
-
 		for it in range(iterations):
 
 			# Sample replay buffer
@@ -97,7 +93,7 @@ class DDPG(object):
 			current_Q = self.critic(state, action)
 
 			# Compute critic loss
-			critic_loss = F.mse_loss(current_Q, target_Q)
+			critic_loss =  F.smooth_l1_loss(current_Q, target_Q)
 
 			# Optimize the critic
 			self.critic_optimizer.zero_grad()

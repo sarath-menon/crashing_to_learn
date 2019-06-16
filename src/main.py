@@ -84,10 +84,9 @@ if __name__ == "__main__":
 
 
             # Check if episode terminated or step-limit reached
-			if done or episode_timesteps==args.max_timesteps-1:
+			if done or episode_timesteps==args.max_timesteps-2:
 				print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timesteps, episode_reward)
-				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath + '/Models/')
-
+				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath+'/Models/')
 				break
 
             # Select action

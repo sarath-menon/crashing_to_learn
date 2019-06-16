@@ -20,6 +20,10 @@ import gc
 import torch.nn as nn
 import math
 from collections import deque
+import pandas as pd
+
+torch.manual_seed(0)
+np.random.seed(0)
 
 #---Directory Path---#
 dirPath = os.path.dirname(os.path.realpath(__file__))
@@ -297,6 +301,8 @@ if __name__ == '__main__':
     pub_result = rospy.Publisher('result', Float32, queue_size=5)
     result = Float32()
     env = gym.make("Mobilerobot-v0")
+    df1 = pd.DataFrame({"collision_n":[0], "overtime_n":[0],"goal_n":[0]})
+    df2 = pd.DataFrame({"episode":[0],"timestep":[0],"linear":[0],"angular":[0],"reward":[0]})
 
     start_time = time.time()
     past_action = np.array([0.,0.])
@@ -343,6 +349,9 @@ if __name__ == '__main__':
             #print('action',action)
             #print('ap',past_action)
             next_state, reward, done, _ = env.step(action)
+            # Load detais to csv file
+            df_temp1 = pd.DataFrame({"episode":[ep], "timestep":[timestep],"linear":[action.item(0)],"reward":[reward]})
+            df1 = df1.append(df_temp1, ignore_index = True)
             # print str(ep+episode_load),'linear_vel:',action.item(0),'angular_vel:',action.item(1),'reward',reward
             past_action = action
 
@@ -369,6 +378,12 @@ if __name__ == '__main__':
                 pub_result.publish(result)
                 m, s = divmod(int(time.time() - start_time), 60)
                 h, m = divmod(m, 60)
+                collision,overtime,goal = env.stats()
+
+                df_temp2 = pd.DataFrame({"episode":[ep],"ep_reward":[rewards_current_episode],"collision_n":[collision],
+                                        "overtime_n":[overtime],"goal_n":[goal]})
+                df2 = df2.append(df_temp2, ignore_index = True)
+
                 break
         exploration_rate = (min_exploration_rate +
                 (max_exploration_rate - min_exploration_rate)* np.exp(-exploration_decay_rate*ep))
@@ -376,5 +391,8 @@ if __name__ == '__main__':
         #print('exp:', exploration_rate)
         if ep%10 == 0:
             trainer.save_models(ep+episode_load)
+            print('Saved files')
+            df1.to_csv('/home/catkin_ws/src/rl_cheap/src/Models/outcome_data.csv')
+            df2.to_csv('/home/catkin_ws/src/rl_cheap/src/Models/step_data.csv')
 
 print('Completed Training')

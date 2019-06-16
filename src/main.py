@@ -49,6 +49,9 @@ if __name__ == "__main__":
 	env = gym.make(args.env_name)
 	torch.manual_seed(args.seed)
 	np.random.seed(args.seed)
+	#Initializing log files
+	df1 = pd.DataFrame({"collision_n":[0], "overtime_n":[0],"goal_n":[0]})
+    df2 = pd.DataFrame({"episode":[0],"timestep":[0],"linear":[0],"angular":[0],"reward":[0]})
 
 	state_dim = env.observation_space.shape[0]
 	action_dim = env.action_space.shape[0]
@@ -63,6 +66,7 @@ if __name__ == "__main__":
 	replay_buffer = utils.ReplayBuffer()
 
 	total_timesteps = 0
+	overtime_n+=1=0    # no of episodes that exceed time limit
 	var_v = max_action[0]* args.expl_noise
 	var_w = max_action[1]* args.expl_noise *2
 
@@ -71,22 +75,28 @@ if __name__ == "__main__":
 		done = False
 		episode_reward = 0
 
-		for episode_timesteps in range(args.max_timesteps):
-
+		for episode_timestep in range(args.max_timesteps):
 			if replay_buffer.length() >= 2*args.max_timesteps:
 				var_v = max([var_v*0.99999, 0.10*max_action[0]])
 				var_w = max([var_w*0.99999, 0.10*max_action[1]])
 
 				if args.policy_name == "TD3":
-					policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau, args.policy_noise, args.noise_clip, args.policy_freq)
+					policy.train(replay_buffer, episode_timestep, args.batch_size, args.discount, args.tau, args.policy_noise, args.noise_clip, args.policy_freq)
 				else:
-					policy.train(replay_buffer, episode_timesteps, args.batch_size, args.discount, args.tau)
+					policy.train(replay_buffer, episode_timestep, args.batch_size, args.discount, args.tau)
 
 
             # Check if episode terminated or step-limit reached
-			if done or episode_timesteps==args.max_timesteps-2:
-				print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timesteps, episode_reward)
+			if done or episode_timestep==args.max_timesteps-2:
+				print("Episode Num: %d Total T: %d Episode T: %d Reward: %f") % (episode_num, total_timesteps, episode_timestep, episode_reward)
+				if step == args.max_timesteps-2:overtime_n+=1
+
+				# Saving models and log files
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath+'/Models/')
+				collision_n, goal_n = env.stats()
+                df_temp2 = pd.DataFrame({'episode':[episode_num], 'ep_reward':[episode_reward], 'collision_n':[collision_n], 'overtime_n':[overtime_n], 'goal_n':[goal_n]})
+                df2 = df2.append(df_temp2, ignore_index = True,sort=False)
+
 				break
 
             # Select action
@@ -97,7 +107,9 @@ if __name__ == "__main__":
 
             # Perform action
 			new_obs, reward, done, _ = env.step(action)
-			done_bool = 0 if episode_timesteps + 1 == args.max_timesteps else float(done)
+			df_temp1 = pd.DataFrame({'episode':[episode_num)], 'timestep':[episode_timestep], 'linear':[action.item(0)], 'angular':[action.item(1)], 'reward':[reward]})
+			df1 = df1.append(df_temp1, ignore_index = True,sort=False)
+			done_bool = 0 if episode_timestep + 2 == args.max_timesteps else float(done)
 			episode_reward += reward
 
 			# Store data in replay buffer

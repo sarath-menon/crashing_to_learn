@@ -326,8 +326,8 @@ if __name__ == '__main__':
                 action = trainer.get_exploitation_action(state)
             next_state, reward, done, _ = env.step(action)
             # Load detais to csv file
-            df_temp1 = pd.DataFrame({"episode":[ep], "timestep":[timestep],"linear":[action.item(0)],"reward":[reward]})
-            df1 = df1.append(df_temp1, ignore_index = True)
+            df_temp1 = pd.DataFrame({"episode":[ep], "timestep":[timestep],"linear":[action.item(0)],"angular":[action.item(1)], "reward":[reward]})
+            df1 = df1.append(df_temp1, ignore_index = True,sort=False)
             # print str(ep+episode_load),'linear_vel:',action.item(0),'angular_vel:',action.item(1),'reward',reward
             past_action = action
 
@@ -355,7 +355,7 @@ if __name__ == '__main__':
 
                 df_temp2 = pd.DataFrame({"episode":[ep],"ep_reward":[rewards_current_episode],"collision_n":[collision_n],
                                         "overtime_n":[overtime_n],"goal_n":[goal_n]})
-                df2 = df2.append(df_temp2, ignore_index = True)
+                df2 = df2.append(df_temp2, ignore_index = True,sort=False)
 
                 break
         exploration_rate = (min_exploration_rate +

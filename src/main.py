@@ -48,10 +48,10 @@ if __name__ == "__main__":
 
 	env = gym.make(args.env_name)
 	torch.manual_seed(args.seed)
-	np.random.seed(args.seed)
+	np.random.seed(args.seed
 	#Initializing log files
 	df1 = pd.DataFrame({"collision_n":[0], "overtime_n":[0],"goal_n":[0]})
-    df2 = pd.DataFrame({"episode":[0],"timestep":[0],"linear":[0],"angular":[0],"reward":[0]})
+	df2 = pd.DataFrame({"episode":[0],"timestep":[0],"linear":[0],"angular":[0],"reward":[0]})
 
 	state_dim = env.observation_space.shape[0]
 	action_dim = env.action_space.shape[0]
@@ -94,8 +94,8 @@ if __name__ == "__main__":
 				# Saving models and log files
 				if episode_num%10==0 : policy.save("%s" % (str(episode_num)+ '_actor.pt'), directory=dirPath+'/Models/')
 				collision_n, goal_n = env.stats()
-                df_temp2 = pd.DataFrame({'episode':[episode_num], 'ep_reward':[episode_reward], 'collision_n':[collision_n], 'overtime_n':[overtime_n], 'goal_n':[goal_n]})
-                df2 = df2.append(df_temp2, ignore_index = True,sort=False)
+				df_temp2 = pd.DataFrame({'episode':[episode_num], 'ep_reward':[episode_reward], 'collision_n':[collision_n], 'overtime_n':[overtime_n], 'goal_n':[goal_n]})
+				df2 = df2.append(df_temp2, ignore_index = True,sort=False)
 
 				break
 

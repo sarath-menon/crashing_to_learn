@@ -306,6 +306,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
     past_action = np.array([0.,0.])
+    timestep= 0
 
     for ep in range(MAX_EPISODES):
         done = False
@@ -314,40 +315,14 @@ if __name__ == '__main__':
 
         rewards_current_episode = 0
         for step in range(MAX_STEPS):
-            #print(step)
             state = np.float32(state)
-            #action = trainer.get_exploration_action(state)
-            #print('actionA:', action)
-
-            #action[0] = np.clip(np.random.normal(action[0], var_v), 0., ACTION_V_MAX)
-            #action[1] = np.clip(np.random.normal(action[1], var_w), -ACTION_W_MAX, ACTION_W_MAX)
-            #print('actionD', action)
-
+            timestep+=1
             if is_training:
-                #if ep%2 == 0:
-                #    action = trainer.get_exploitation_action(state)
-                #    #print('aa', action)
-                #else:
                 action = trainer.get_exploration_action(state)
-                #    #print('aa',action)
                 action[0] = np.clip(np.random.normal(action[0], var_v), 0., ACTION_V_MAX)
                 action[1] = np.clip(np.random.normal(action[1], var_w), -ACTION_W_MAX, ACTION_W_MAX)
-                #action[0] = np.clip(action[0], 0., ACTION_V_MAX)
-                #action[1] = np.clip(action[1], -ACTION_W_MAX, ACTION_W_MAX)
-            #print('af', action)
-
-            #exploration_rate_threshold = random.uniform(0., 1.)
-            #if exploration_rate_threshold > exploration_rate:
-            #    action = trainer.get_exploration_action(state)
-            #else:
-            #    action = np.array([np.random.uniform(0,0.22), np.random.uniform(-1,1)])
-
             if not is_training:
-                #print('nor')
                 action = trainer.get_exploitation_action(state)
-            #print('state',state)
-            #print('action',action)
-            #print('ap',past_action)
             next_state, reward, done, _ = env.step(action)
             # Load detais to csv file
             df_temp1 = pd.DataFrame({"episode":[ep], "timestep":[timestep],"linear":[action.item(0)],"reward":[reward]})
@@ -360,15 +335,10 @@ if __name__ == '__main__':
             ram.add(state, action, reward, next_state)
             state = next_state
 
-            #action = np.array([np.random.uniform(0.,0.15), np.random.uniform(-0.5, 0.5)])
-            #print('r: ' + str(reward) + ' and done: ' + str(done))
-
             if ram.len >= 2*MAX_STEPS and is_training:
                 var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
                 var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
                 trainer.optimizer()
-            #if is_training:
-            #    trainer.optimizer()
 
             if done or step == MAX_STEPS-1:
                 print('reward per ep: ' + str(rewards_current_episode))
@@ -388,7 +358,7 @@ if __name__ == '__main__':
         exploration_rate = (min_exploration_rate +
                 (max_exploration_rate - min_exploration_rate)* np.exp(-exploration_decay_rate*ep))
         gc.collect()
-        #print('exp:', exploration_rate)
+
         if ep%10 == 0:
             trainer.save_models(ep+episode_load)
             print('Saved files')

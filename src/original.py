@@ -343,7 +343,7 @@ if __name__ == '__main__':
             #print('action',action)
             #print('ap',past_action)
             next_state, reward, done, _ = env.step(action)
-            print str(ep+episode_load),'linear_vel:',action.item(0),'angular_vel:',action.item(1),'reward',reward
+            # print str(ep+episode_load),'linear_vel:',action.item(0),'angular_vel:',action.item(1),'reward',reward
             past_action = action
 
             rewards_current_episode += reward

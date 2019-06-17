@@ -33,8 +33,6 @@ class Actor(nn.Module):
 			x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
 		return x
 
-
-
 class Critic(nn.Module):
 	def __init__(self, state_dim, action_dim, eps=0.003):
 		super(Critic, self).__init__()

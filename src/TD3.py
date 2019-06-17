@@ -29,8 +29,9 @@ class Actor(nn.Module):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
 		x = self.max_action * torch.tanh(self.l3(x))
-		linear = self.l_linear(x)
-		angular = self.l_angular(x)
+		
+		linear = torch.sigmoid(self.l_linear(x)) * max_action[0]
+		angular = torch.tanh(self.l_angular(x)) * max_action[1]
 		return torch.cat((x, x), 0)
 
 class Critic(nn.Module):

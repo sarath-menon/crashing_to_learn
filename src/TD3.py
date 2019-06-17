@@ -90,7 +90,7 @@ class TD3(object):
 
 	def select_action(self, state):
 		state = torch.from_numpy(state)
-		action = self.actor.forward(state).detach()
+		action = self.actor(state).cpu().detach()
 		new_action = action.data.numpy()
 		return new_action
 

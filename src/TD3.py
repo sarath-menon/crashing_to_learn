@@ -24,13 +24,12 @@ class Actor(nn.Module):
 
 		self.max_action = max_action
 
-
 	def forward(self, x):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
 
-		linear = torch.sigmoid(self.l_linear(x)) * max_action[0]
-		angular = torch.tanh(self.l_angular(x)) * max_action[1]
+		linear = torch.sigmoid(self.l_linear(x)) * self.max_action[0]
+		angular = torch.tanh(self.l_angular(x)) * self.max_action[1]
 		return torch.cat((x, x), 0)
 
 class Critic(nn.Module):

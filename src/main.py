@@ -12,7 +12,7 @@ import OurDDPG
 import DDPG
 
 import rospy
-import pandas as pd 
+import pandas as pd
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
@@ -61,7 +61,6 @@ if __name__ == "__main__":
 
 	# Initialize policy
 	if args.policy_name == "TD3":policy = TD3.TD3(state_dim, action_dim, max_action)
-	elif args.policy_name == "OurDDPG": policy = OurDDPG.DDPG(state_dim, action_dim, max_action)
 	elif args.policy_name == "DDPG": policy = DDPG.DDPG(state_dim, action_dim, max_action)
 
 	replay_buffer = utils.ReplayBuffer()
@@ -77,6 +76,7 @@ if __name__ == "__main__":
 		episode_reward = 0
 
 		for episode_timestep in range(args.max_timesteps):
+			state = np.float32(state)
 			if replay_buffer.length() >= 2*args.max_timesteps:
 				var_v = max([var_v*0.99999, 0.10*max_action[0]])
 				var_w = max([var_w*0.99999, 0.10*max_action[1]])

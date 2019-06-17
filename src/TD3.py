@@ -32,7 +32,7 @@ class Actor(nn.Module):
 			x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
 			x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
 		return x
-		return x
+
 
 
 class Critic(nn.Module):
@@ -91,8 +91,10 @@ class TD3(object):
 
 
 	def select_action(self, state):
-		state = torch.FloatTensor(state.reshape(1, -1)).to(device)
-		return self.actor(state).cpu().data.numpy().flatten()
+		state = torch.from_numpy(state)
+		action = self.actor.forward(state).detach()
+		new_action = action.data.numpy()
+		return new_action
 
 
 	def train(self, replay_buffer, iterations, batch_size=100, discount=0.99, tau=0.005, policy_noise=0.2, noise_clip=0.5, policy_freq=2):

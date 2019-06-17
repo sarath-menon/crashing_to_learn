@@ -358,7 +358,7 @@ if __name__ == '__main__':
         if ep%10 == 0:
             trainer.save_models(ep+episode_load)
             print('Saved files')
-            df1.to_csv(dirPath + '/log_files/'+ outcome_data.csv')
-            df2.to_csv(dirPath + '/log_files/'+ step_data.csv')
+            df1.to_csv(dirPath + '/log_files/'+ 'outcome_data.csv')
+            df2.to_csv(dirPath + '/log_files/'+ 'step_data.csv')
 
 print('Completed Training')

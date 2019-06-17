@@ -76,7 +76,6 @@ if __name__ == "__main__":
 		episode_reward = 0
 
 		for episode_timestep in range(args.max_timesteps):
-			obs = np.float32(obs)
 			if replay_buffer.length() >= 2*args.max_timesteps:
 				var_v = max([var_v*0.99999, 0.10*max_action[0]])
 				var_w = max([var_w*0.99999, 0.10*max_action[1]])

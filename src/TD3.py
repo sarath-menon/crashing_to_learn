@@ -15,8 +15,12 @@ class Actor(nn.Module):
 		torch.nn.init.xavier_uniform_(self.l1.weight)
 		self.l2 = nn.Linear(512, 512)
 		torch.nn.init.xavier_uniform_(self.l2.weight)
-		self.l3 = nn.Linear(512, action_dim)
-		self.l3.weight.data.uniform_(-eps, eps)
+
+		self.l_linear = nn.Linear(512, 1)
+		self.l_linear.weight.data.uniform_(-eps, eps)
+
+		self.l_angular = nn.Linear(512, 1)
+		self.l_angular.weight.data.uniform_(-eps, eps)
 
 		self.max_action = max_action
 
@@ -25,13 +29,9 @@ class Actor(nn.Module):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
 		x = self.max_action * torch.tanh(self.l3(x))
-		if x.shape == torch.Size([14]):
-			x[0] = torch.sigmoid(x[0])*  self.max_action[0]
-			x[1] = torch.tanh(x[1])*  self.max_action[1]
-		else:
-			x[:,0] = torch.sigmoid(x[:,0])* self.max_action[0]
-			x[:,1] = torch.tanh(x[:,1])*  self.max_action[1]
-		return x
+		linear = self.l_linear(x)
+		angular = self.l_angular(x)
+		return torch.cat((x, x), 0)
 
 class Critic(nn.Module):
 	def __init__(self, state_dim, action_dim, eps=0.003):
@@ -89,10 +89,8 @@ class TD3(object):
 
 
 	def select_action(self, state):
-		state = torch.from_numpy(state)
-		action = self.actor(state).cpu().detach()
-		new_action = action.data.numpy()
-		return new_action
+		state = torch.FloatTensor(state.reshape(1, -1)).to(device)
+		return self.actor(state).cpu().data.numpy().flatten()
 
 
 	def train(self, replay_buffer, iterations, batch_size=100, discount=0.99, tau=0.005, policy_noise=0.2, noise_clip=0.5, policy_freq=2):

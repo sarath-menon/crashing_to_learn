@@ -11,7 +11,6 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from collections import deque
 from std_msgs.msg import Float32
-# from environment_stage_1 import Env
 import gym
 import gym_mobilerobot
 import torch
@@ -37,26 +36,36 @@ def hard_update(target,source):
     for target_param, param in zip(target.parameters(), source.parameters()):
         target_param.data.copy_(param.data)
 
-#---Ornstein-Uhlenbeck Noise for action---#
+#---Actor---#
 
-class ActionNoise:
-    # Based on http://math.stackexchange.com/questions/1287634/implementing-ornstein-uhlenbeck-in-matlab
-    def __init__(self, action_dim, mu=0, theta=0.15, sigma=0.2):
+class Actor(nn.Module):
+    def __init__(self, state_dim, action_dim, action_limit_v, action_limit_w):
+        super(Actor, self).__init__()
+        self.state_dim = state_dim = state_dim
         self.action_dim = action_dim
-        self.mu = mu
-        self.theta = theta
-        self.sigma = sigma
-        self.X = np.ones(self.action_dim)*self.mu
+        self.action_limit_v = action_limit_v
+        self.action_limit_w = action_limit_w
 
-    def reset(self):
-        self.X = np.ones(self.action_dim)*self.mu
+        self.fa1 = nn.Linear(state_dim, 512)
+        self.fa1.weight.data = fanin_init(self.fa1.weight.data.size())
 
-    def sample(self):
-        dx = self.theta*(self.mu - self.X)
-        dx = dx + self.sigma*np.random.randn(len(self.X))
-        self.X = self.X + dx
-        print('aqu2i' + str(self.X))
-        return self.X
+        self.fa2 = nn.Linear(512, 512)
+        self.fa2.weight.data = fanin_init(self.fa2.weight.data.size())
+
+        self.fa3 = nn.Linear(512, action_dim)
+        self.fa3.weight.data.uniform_(-EPS,EPS)
+
+    def forward(self, state):
+        x = torch.relu(self.fa1(state))
+        x = torch.relu(self.fa2(x))
+        action = self.fa3(x)
+        if state.shape == torch.Size([14]):
+            action[0] = torch.sigmoid(action[0])*self.action_limit_v
+            action[1] = torch.tanh(action[1])*self.action_limit_w
+        else:
+            action[:,0] = torch.sigmoid(action[:,0])*self.action_limit_v
+            action[:,1] = torch.tanh(action[:,1])*self.action_limit_w
+        return action
 
 #---Critic--#
 
@@ -92,37 +101,6 @@ class Critic(nn.Module):
         x = torch.relu(self.fca1(x))
         vs = self.fca2(x)
         return vs
-
-#---Actor---#
-
-class Actor(nn.Module):
-    def __init__(self, state_dim, action_dim, action_limit_v, action_limit_w):
-        super(Actor, self).__init__()
-        self.state_dim = state_dim = state_dim
-        self.action_dim = action_dim
-        self.action_limit_v = action_limit_v
-        self.action_limit_w = action_limit_w
-
-        self.fa1 = nn.Linear(state_dim, 512)
-        self.fa1.weight.data = fanin_init(self.fa1.weight.data.size())
-
-        self.fa2 = nn.Linear(512, 512)
-        self.fa2.weight.data = fanin_init(self.fa2.weight.data.size())
-
-        self.fa3 = nn.Linear(512, action_dim)
-        self.fa3.weight.data.uniform_(-EPS,EPS)
-
-    def forward(self, state):
-        x = torch.relu(self.fa1(state))
-        x = torch.relu(self.fa2(x))
-        action = self.fa3(x)
-        if state.shape == torch.Size([14]):
-            action[0] = torch.sigmoid(action[0])*self.action_limit_v
-            action[1] = torch.tanh(action[1])*self.action_limit_w
-        else:
-            action[:,0] = torch.sigmoid(action[:,0])*self.action_limit_v
-            action[:,1] = torch.tanh(action[:,1])*self.action_limit_w
-        return action
 
 #---Memory Buffer---#
 
@@ -171,8 +149,6 @@ class Trainer:
         self.action_limit_w = action_limit_w
         #print('w',self.action_limit_w)
         self.ram = ram
-        #self.iter = 0
-        self.noise = ActionNoise(self.action_dim)
 
         self.actor = Actor(self.state_dim, self.action_dim, self.action_limit_v, self.action_limit_w)
         self.target_actor = Actor(self.state_dim, self.action_dim, self.action_limit_v, self.action_limit_w)
@@ -197,6 +173,19 @@ class Trainer:
         action = self.actor.forward(state).detach()
         new_action = action.data.numpy()
         return new_action
+    
+    def get_exploration_noise(self,goal_count, noise_decay='timestep_based'):
+        print('policy update')
+        if noise_decay=='timestep_based':
+            var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
+            var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
+
+        elif noise_decay=='goal_count_based':
+            var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
+            var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
+
+        return var_v,var_w
+
 
     def optimizer(self):
         s_sample, a_sample, r_sample, new_s_sample = ram.sample(BATCH_SIZE)
@@ -300,6 +289,7 @@ if __name__ == '__main__':
     start_time = time.time()
     past_action = np.array([0.,0.])
     overtime_n=0
+    goal_n=0
     timestep= 0
 
     for ep in range(MAX_EPISODES):
@@ -330,8 +320,9 @@ if __name__ == '__main__':
             state = next_state
 
             if ram.len >= 2*MAX_STEPS and is_training:
-                var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
-                var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
+                # var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
+                # var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
+                var_v,var_w = get_exploration_noise(goal_n)
                 trainer.optimizer()
 
             if done or step == MAX_STEPS-1:

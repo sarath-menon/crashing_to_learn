@@ -168,7 +168,7 @@ class Trainer:
         action = self.target_actor.forward(state).detach()
         return action.data.numpy()
 
-    def get_exploration_noise(self, state):
+    def get_exploration_action(self, state):
         state = torch.from_numpy(state)
         action = self.actor.forward(state).detach()
         new_action = action.data.numpy()
@@ -322,7 +322,7 @@ if __name__ == '__main__':
             if ram.len >= 2*MAX_STEPS and is_training:
                 # var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
                 # var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
-                var_v,var_w = get_exploration_noise(goal_n)
+                var_v,var_w = trainer.get_exploration_noise(goal_n)
                 trainer.optimizer()
 
             if done or step == MAX_STEPS-1:

@@ -168,12 +168,12 @@ class Trainer:
         action = self.target_actor.forward(state).detach()
         return action.data.numpy()
 
-    def get_exploration_action(self, state):
+    def get_exploration_noise(self, state):
         state = torch.from_numpy(state)
         action = self.actor.forward(state).detach()
         new_action = action.data.numpy()
         return new_action
-    
+
     def get_exploration_noise(self,goal_count, noise_decay='timestep_based'):
         print('policy update')
         if noise_decay=='timestep_based':

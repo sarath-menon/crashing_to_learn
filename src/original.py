@@ -174,7 +174,7 @@ class Trainer:
         new_action = action.data.numpy()
         return new_action
 
-    def get_exploration_noise(self,goal_count, noise_decay='timestep_based'):
+    def get_exploration_noise(self,goal_count, var_v, var_w, noise_decay='timestep_based'):
         print('policy update')
         if noise_decay=='timestep_based':
             var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
@@ -322,7 +322,7 @@ if __name__ == '__main__':
             if ram.len >= 2*MAX_STEPS and is_training:
                 # var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
                 # var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])
-                var_v,var_w = trainer.get_exploration_noise(goal_n)
+                var_v,var_w = trainer.get_exploration_noise(goal_n, var_v, var_w)
                 trainer.optimizer()
 
             if done or step == MAX_STEPS-1:

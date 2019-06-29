@@ -175,7 +175,6 @@ class Trainer:
         return new_action
 
     def get_exploration_noise(self,goal_count, var_v, var_w, noise_decay='timestep_based'):
-        print('policy update')
         if noise_decay=='timestep_based':
             var_v = max([var_v*0.99999, 0.10*ACTION_V_MAX])
             var_w = max([var_w*0.99999, 0.10*ACTION_W_MAX])

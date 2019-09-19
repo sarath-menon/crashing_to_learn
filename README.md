@@ -6,7 +6,6 @@ Openai Gym
 
 ```
 pip install gym
-
 ```
 Custom gym environemnt in ROS gazebo for mobile robot navigation
 
@@ -23,6 +22,7 @@ https://github.com/sarath-menon/turtlebot3_simulations.git
 
 ## Download and build package
 
+```
 cd ~/catkin_ws/src/
 git clone https://github.com/sarath-menon/rl_cheap.git
 cd ..
@@ -37,6 +37,7 @@ First train in obstacle free environemnt
 roslaunch turtlebot3_gazebo train_obstacle_free.launch
 ```
 Then train in environemnt with dyanamic obstacles
+
 ```
 roslaunch turtlebot3_gazebo custom_collision.launch         
 ```
